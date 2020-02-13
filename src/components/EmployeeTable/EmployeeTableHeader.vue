@@ -1,7 +1,6 @@
 <template>
     <thead>
       <tr>
-        <th>Select</th>
         <th>ID</th>
         <th>First Name</th>
         <th>Last Name</th>

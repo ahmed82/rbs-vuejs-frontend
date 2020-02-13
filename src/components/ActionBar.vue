@@ -1,23 +1,41 @@
 <template>
   <div class="actions-bar">
-    <button
-     class="button-bar--button edit"
-     @click="$emit('action', 'edit')"
-     :disabled="disabled">
-      Edit
-    </button>
-    <button
-     class="button-bar--button delete"
-     @click="$emit('action', 'delete')"
-     :disabled="disabled">
-      Delete
-    </button>
-    <button
-     class="button-bar--button add"
-     @click="$emit('action', 'add')"
-     :disabled="!disabled">
-      Add
-    </button>
+    <div class="level">
+      <div class="field is-grouped has-addons">
+        <button
+          class="button is-success actions-bar-button control is-small"
+          @click.stop.prevent="$emit('action', 'add')"
+          :disabled="!disabled"
+        >
+          <span class="icon is-small">
+            <i class="fas fa-plus" />
+          </span>
+          <span>Add</span>
+        </button>
+        <button
+          class="button is-primary actions-bar-button control is-small"
+          @click.prevent="$emit('action', 'edit')"
+          :disabled="disabled"
+        >
+          <span class="icon is-small">
+            <i class="fas fa-edit" />
+          </span>
+          <span>Edit</span>
+        </button>
+      </div>
+      <div class="level-right has-addons">
+        <button
+          class="button is-danger actions-bar-button control is-small"
+          @click="$emit('action', 'delete')"
+          :disabled="disabled"
+        >
+          <span class="icon is-small">
+            <i class="fas fa-times" />
+          </span>
+          <span>Delete</span>
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -32,33 +50,8 @@ export default {
 };
 </script>
 <style lang="scss">
-  .actions-bar {
-    display: flex;
-    justify-content: flex-start;
-
-    .button-bar--button  {
-      margin: 10px;
-      cursor: pointer;
-      width: 75px;
-      height: 30px;
-      color: white;
-      font-size: 14px;
-      font-weight: bold;
-      border: none;
-
-      &.add {
-        background-color: green;
-      }
-      &.delete {
-        background-color: red;
-      }
-      &.edit {
-        background-color: blue;
-      }
-            &:disabled {
-        background-color: lightgrey;
-      }
-    }
+  .actions-bar-button {
+    width: 80px;
+    font-weight: 700;
   }
-
 </style>

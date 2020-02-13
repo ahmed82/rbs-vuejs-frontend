@@ -1,90 +1,142 @@
 <template>
-  <form class="employee-form">
-    <label>
-      <div class="label-text">First Name</div>
-      <input type="text" v-model="form.firstName">
-    </label>
-    <label>
-      <div class="label-text">Last Name</div>
-      <input type="text" v-model="form.lastName">
-    </label>
-    <label>
-      <div class="label-text">Address</div>
-      <input type="text" v-model="form.address">
-    </label>
-    <label>
-      <div class="label-text">Phone</div>
-      <input type="text" v-model="form.phone">
-    </label>
-    <hr>
-    <button
-      @click.prevent="$emit('save', form)"
-      :disabled="!isFormValid"
-    >
-      {{ buttonText }}
-    </button>
-  </form>
+  <div class="level-item has=text=centered">
+      <form>
+      <h1 class="title is-4">{{ title }}</h1>
+      <div class="field">
+        <label class="label">First Name</label>
+        <div class="control">
+          <input class="input"
+            type="text"
+            :value="form.getFirstName()"
+            @input="form.setFirstName($event.target.value)"
+            />
+        </div>
+        <p class="help is-danger" v-show="!isRequiredSatisfied('firstname')">
+          First name is required
+        </p>
+      </div>
+      <div class="field">
+        <label class="label">Last Name</label>
+        <div class="control">
+          <input class="input"
+            type="text"
+            :value="form.getLastName()"
+            @input="form.setLastName($event.target.value)"
+            />
+        </div>
+        <p class="help is-danger" v-show="!isRequiredSatisfied('lastname')">
+          Last name is required
+        </p>
+      </div>
+      <div class="field">
+        <label class="label">Address</label>
+        <div class="control">
+          <input class="input"
+            type="text"
+            :value="form.getAddress()"
+            @change="form.setAddress($event.target.value)"
+            />
+        </div>
+        <p class="help is-danger" v-show="!isRequiredSatisfied('address')">
+          Address name is required
+        </p>
+      </div>
+      <div class="field">
+        <label class="label">Phone</label>
+        <div class="control">
+          <input class="input"
+            type="text"
+            :value="form.getPhone()"
+            @input="form.setPhone($event.target.value)"
+            />
+        </div>
+        <p class="help is-danger" v-show="!isRequiredSatisfied('phone')">
+          Phone is required
+        </p>
+      </div>
+      <div class="field has-addons">
+        <div class="control">
+          <button
+            class="button is-success"
+            @click.prevent="$emit('save', form)" :disabled="!isFormValid || !hasChanged"
+          >
+            <span class="icon is-small">
+              <i class="fas fa-save" />
+            </span>
+            <span>{{ buttonText }}</span>
+          </button>
+          <button
+            class="button is-danger"
+            style="margin-left: 10px;"
+            @click.stop="$emit('cancel')"
+          >
+            <span>Cancel</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
 </template>
 <script>
+import Employee from '@/models/Employee';
+
 export default {
   name: 'EmployeeForm',
   props: {
     employee: {
-      type: Object,
-      default: () => ({}),
+      type: Employee,
+      default: () => new Employee({}),
     },
     buttonText: {
       type: String,
       default: 'Submit',
     },
+    action: {
+      type: String,
+      default: 'Add',
+    },
   },
   data() {
     return {
-      form: { ...this.employee },
+      form: Employee.clone(this.employee),
     };
   },
   computed: {
+    title() {
+      return `${this.action} Employee`;
+    },
     isFormValid() {
-      return this.form.firstName && this.form.lastName && this.form.address && this.form.phone;
+      return (
+        !!this.form.firstname
+        && !!this.form.lastname
+        && !!this.form.address
+        && !!this.form.phone
+      );
+    },
+    hasChanged() {
+      return !Employee.compare(this.employee, this.form);
+    },
+  },
+  methods: {
+    isRequiredSatisfied(fieldName) {
+      return this.form[fieldName] !== '';
     },
   },
 };
 </script>
 <style lang="scss" scoped>
-  .employee-form {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    label {
-      padding: 5px;
-    }
-    .label-text {
-      display: inline-block;
-      width: 100px;
-      padding: 5px;
-      text-align: justify;
-    }
-    input {
-      height: 30px;
-      width: 200px;
-      border: 2px solid darkgrey;
-      border-radius: 2px;
-      padding-left: 5px;
-    }
-    button {
-      cursor: pointer;
-      width: 100px;
-      height: 40px;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      border: none;
-      background-color: green;
-      &:disabled {
-        background-color: lightgrey;
-      }
-    }
+form {
+  width: 400px;
+  text-align: justify;
+  .help {
+    font-weight: 700;
   }
+  .title {
+    text-transform: capitalize;
+    padding-bottom: 5px;
+    border-bottom: 2px solid lightgrey;
+    margin-bottom: 10px;
+  }
+}
 
 </style>

@@ -1,28 +1,38 @@
 <template>
-  <div>
-    <template v-if="action === 'view' || action === 'delete'">
-      <ActionBar @action="handleAction" :disabled="!selectedEmployeeId"/>
-      <table>
-        <EmployeeTableHeader />
-        <tbody>
-          <EmployeeTableRow
-            class="employee-table"
-            v-for="employee in employees"
-            :key="employee.id"
-            :employee="employee"
-            @select-employee="selectEmployee"
-            :selectedId="selectedEmployeeId"
-          />
-        </tbody>
-      </table>
-    </template>
-    <template v-else>
-      <EmployeeForm
-        :employee="employeeData"
-        @save="handleSave"
-        :buttonText="action === 'edit' ? 'Update' : 'Save'"
-      />
-    </template>
+  <div class="container">
+      <template>
+        <div v-show="action === 'view' || action === 'delete'">
+          <h1 class="title is-3" style="text-align: justify;">
+            Employees
+            <span class="subtitle is-6" >(click row to toggle select)</span>
+          </h1>
+          <ActionBar @action="handleAction" :disabled="!selectedEmployeeId"/>
+          <table class="table is-striped is-hoverable is-fullwidth">
+            <EmployeeTableHeader />
+            <tbody>
+              <EmployeeTableRow
+                class="employee-table"
+                v-for="employee in employees"
+                :key="employee.id"
+                :employee="employee"
+                @select-employee="selectEmployee"
+                :selectedId="selectedEmployeeId"
+              />
+            </tbody>
+          </table>
+        </div>
+      </template>
+      <template >
+        <EmployeeForm
+          v-if="action === 'edit' || action === 'add'"
+          :employee="employeeData"
+          @save="handleSave"
+          @cancel="action = 'view'"
+          :action="action"
+          :buttonText="action === 'edit' ? 'Update' : 'Save'"
+        />
+      </template>
+
   </div>
 </template>
 <script>
@@ -30,8 +40,7 @@ import EmployeeTableHeader from '@/components/EmployeeTable/EmployeeTableHeader.
 import EmployeeTableRow from '@/components/EmployeeTable/EmployeeTableRow.vue';
 import EmployeeForm from '@/components/EmployeeTable/EmployeeForm.vue';
 import ActionBar from '@/components/ActionBar.vue';
-
-import { getters, mutations, actions } from '../../store';
+import { getters, setters, methods } from '@/stores/employeeStore';
 
 export default {
   name: 'EmployeeTable',
@@ -46,21 +55,41 @@ export default {
       action: 'view',
     };
   },
+  created() {
+    this.fetchAllEmployees();
+  },
+  mounted() {
+    const tbody = document.querySelector('table tbody');
+    tbody.addEventListener('click', this.handleInsideClick);
+    window.addEventListener('click', this.handleOutsideClick);
+  },
+  destroyed() {
+    const tbody = document.querySelector('table tbody');
+    tbody.removeEventListener('click', this.handleInsideClick);
+    window.removeEventListener('click', this.handleOutsideClick);
+  },
   methods: {
-    ...mutations,
-    ...actions,
+    ...setters,
+    ...methods,
+    handleInsideClick(evt) {
+      evt.stopPropagation();
+    },
+    handleOutsideClick() {
+      if (this.action !== 'view') return;
+
+      this.selectEmployee(null);
+    },
     handleAction(action) {
       if (action === 'delete') {
-        this.removeEmployee();
+        this.deleteEmployee();
       }
       this.action = action;
     },
     async handleSave(data) {
-      console.log(data);
       if (this.action === 'edit') {
-        await this.updateEmployee(data);
+        await this.editEmployee(data);
       } else {
-        await this.createEmployee(data);
+        await this.addEmployee(data);
       }
 
       this.action = 'view';
@@ -72,27 +101,11 @@ export default {
       if (this.action === 'edit') {
         return this.selectedEmployee;
       }
-      return {
-        firstName: '', lastName: '', address: '', phone: '',
-      };
+      return undefined;
     },
   },
 };
 </script>
 <style lang="scss">
-  table, thead, th {
-    border: 1px solid black;
-    padding: 2px;
-  }
-  table {
-     border-collapse: collapse;
-  }
-  tbody {
-    tr:nth-child(odd)  {
-      background-color: lightblue;
-    }
-  }
-  td {
-    width: 200px;
-  }
+
 </style>
