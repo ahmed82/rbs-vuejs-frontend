@@ -15,7 +15,7 @@ const state = Vue.observable({
   //   }),
   // ],
   employees: [],
-  selectedEmployee: null,
+  selectedEmployees: [],
 });
 
 export const getters = {
@@ -23,10 +23,10 @@ export const getters = {
     return state.employees;
   },
   selectedEmployeeId() {
-    return (state.selectedEmployee && state.selectedEmployee.id) || 0;
+    return (state.selectedEmployees.length && state.selectedEmployees[0].id) || 0;
   },
-  selectedEmployee() {
-    return state.selectedEmployee;
+  selectedEmployees() {
+    return state.selectedEmployees;
   },
 };
 
@@ -34,8 +34,8 @@ export const setters = {
   setEmployees(employees) {
     state.employees = employees;
   },
-  setSelectedEmployee(employee) {
-    state.selectedEmployee = employee;
+  setSelectedEmployees(employees) {
+    state.selectedEmployees = employees;
   },
 };
 
@@ -48,19 +48,31 @@ export const methods = {
   findEmployeeById(id) {
     return state.employees.find((e) => e.id === id);
   },
+  findSelectedEmployeeById(id) {
+    return getters.selectedEmployees().find((e) => e.id === id);
+  },
   selectEmployee(id) {
     const employee = this.findEmployeeById(id);
-    setters.setSelectedEmployee(employee);
+    const selectedEmployee = this.findSelectedEmployeeById(id);
+
+    if (selectedEmployee) {
+      setters.setSelectedEmployees(
+        getters.selectedEmployees().filter((e) => !Employee.isEqual(e, selectedEmployee)),
+      );
+    } else {
+      setters.setSelectedEmployees([...getters.selectedEmployees(), employee]);
+    }
   },
   async addEmployee(employee) {
     setters.setEmployees([...getters.employees(), new Employee(employee)]);
   },
   editEmployee(data) {
-    state.selectedEmployee.updateValues(data);
+    const employee = getters.selectedEmployees()[0];
+    employee.updateValues(data);
   },
   deleteEmployee() {
-    setters.setEmployees(state.employees.filter((e) => e.id !== getters.selectedEmployeeId()));
-    setters.setSelectedEmployee(null);
+    setters.setEmployees(state.employees.filter((e) => !getters.selectedEmployees().includes(e)));
+    setters.setSelectedEmployees([]);
   },
 };
 

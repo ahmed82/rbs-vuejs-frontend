@@ -1,7 +1,7 @@
 <template>
   <tr
-    :class="{ 'is-selected': isEmployeeSelected(employee.id) }"
-    @click="handleClick(employee.id)"
+    :class="{ 'is-selected': selected }"
+    @click.stop="handleClick"
   >
     <td class="employe-table--row--cell">{{ employee.id }}</td>
     <td class="employe-table--row--cell">{{ employee.firstname }}</td>
@@ -18,17 +18,14 @@ export default {
       type: Object,
       default: () => ({}),
     },
-    selectedId: {
-      type: Number,
-      default: 0,
+    selected: {
+      type: Boolean,
+      default: false,
     },
   },
   methods: {
-    isEmployeeSelected(id) {
-      return id === this.selectedId;
-    },
-    handleClick(id) {
-      this.$emit('select-employee', !this.isEmployeeSelected(id) ? id : 0);
+    handleClick() {
+      this.$emit('select-employee', this.employee.id);
     },
   },
 };

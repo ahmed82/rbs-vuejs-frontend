@@ -1,62 +1,76 @@
 /* eslint-disable no-underscore-dangle */
 export default class Employee {
+  // _ signifies treating these fields as private
+  // private fields have been added to JavaScript
+  // and Babel handles them, but they are not reactive in Vue
+  // using _ as a placeholder until I can resolve the reactivity problem
+  _id = null
+
+  _firstname = ''
+
+  _lastname = ''
+
+  _address = ''
+
+  _phone = ''
+
   constructor({
     id, firstname, lastname, address, phone,
   }) {
-    this.id = id || new Date().getTime();
-    this.firstname = firstname;
-    this.lastname = lastname;
-    this.address = address;
-    this.phone = phone;
+    this._id = id || new Date().getTime();
+    this._firstname = firstname || '';
+    this._lastname = lastname || '';
+    this._address = address || '';
+    this._phone = phone || '';
   }
 
-  setId(id) {
-    this.id = id;
+  set id(id) {
+    this._id = id;
   }
 
-  getId() {
-    return this.id;
+  get id() {
+    return this._id;
   }
 
-  setFirstName(firstname) {
-    this.firstname = firstname;
+  set firstname(firstname) {
+    this._firstname = firstname;
   }
 
-  getFirstName() {
-    return this.firstname;
+  get firstname() {
+    return this._firstname;
   }
 
-  getLastName() {
-    return this.lastname;
+  get lastname() {
+    return this._lastname;
   }
 
-  setLastName(lastname) {
-    this.lastname = lastname;
+  set lastname(lastname) {
+    this._lastname = lastname;
   }
 
-  getAddress() {
-    return this.address;
+  get address() {
+    return this._address;
   }
 
-  setAddress(address) {
-    this.address = address;
+  set address(address) {
+    this._address = address;
   }
 
-  getPhone() {
-    return this.phone;
+  get phone() {
+    return this._phone;
   }
 
-  setPhone(phone) {
-    this.phone = phone;
+  set phone(phone) {
+    this._phone = phone;
   }
 
   updateValues({
     firstname, lastname, address, phone,
   }) {
-    this.firstname = firstname;
-    this.lastname = lastname;
-    this.address = address;
-    this.phone = phone;
+    this._firstname = firstname;
+    this._lastname = lastname;
+    this._address = address;
+    this._phone = phone;
   }
 
   static isEqual(emp1, emp2) {
@@ -71,7 +85,6 @@ export default class Employee {
   }
 
   static clone(emp) {
-    console.log('emp', emp);
     return new Employee({
       id: emp.id,
       firstname: emp.firstname,

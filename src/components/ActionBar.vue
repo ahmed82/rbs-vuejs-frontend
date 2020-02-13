@@ -15,7 +15,7 @@
         <button
           class="button is-primary actions-bar-button control is-small"
           @click.prevent="$emit('action', 'edit')"
-          :disabled="disabled"
+          :disabled="disabled || hasMultipleSelections"
         >
           <span class="icon is-small">
             <i class="fas fa-edit" />
@@ -39,6 +39,7 @@
   </div>
 </template>
 <script>
+
 export default {
   name: 'ActionBar',
   props: {
@@ -46,7 +47,14 @@ export default {
       type: Boolean,
       default: false,
     },
+    hasMultipleSelections: {
+      disabled: {
+        type: Boolean,
+        default: false,
+      },
+    },
   },
+
 };
 </script>
 <style lang="scss">

@@ -6,7 +6,10 @@
             Employees
             <span class="subtitle is-6" >(click row to toggle select)</span>
           </h1>
-          <ActionBar @action="handleAction" :disabled="!selectedEmployeeId"/>
+          <ActionBar
+            @action="handleAction"
+            :disabled="!selectedEmployeeId"
+            :has-multiple-selections="!!(selectedEmployees.length > 1)"/>
           <table class="table is-striped is-hoverable is-fullwidth">
             <EmployeeTableHeader />
             <tbody>
@@ -16,7 +19,7 @@
                 :key="employee.id"
                 :employee="employee"
                 @select-employee="selectEmployee"
-                :selectedId="selectedEmployeeId"
+                :selected="!!findSelectedEmployeeById(employee.id)"
               />
             </tbody>
           </table>
@@ -77,7 +80,7 @@ export default {
     handleOutsideClick() {
       if (this.action !== 'view') return;
 
-      this.selectEmployee(null);
+      this.setSelectedEmployees([]);
     },
     handleAction(action) {
       if (action === 'delete') {
@@ -99,7 +102,7 @@ export default {
     ...getters,
     employeeData() {
       if (this.action === 'edit') {
-        return this.selectedEmployee;
+        return this.selectedEmployees[0];
       }
       return undefined;
     },
