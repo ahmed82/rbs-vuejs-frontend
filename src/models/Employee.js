@@ -4,7 +4,7 @@ export default class Employee {
   // private fields have been added to JavaScript
   // and Babel handles them, but they are not reactive in Vue
   // using _ as a placeholder until I can resolve the reactivity problem
-  _id = null
+  _id
 
   _firstname = ''
 
@@ -17,7 +17,7 @@ export default class Employee {
   constructor({
     id, firstname, lastname, address, phone,
   }) {
-    this._id = id || new Date().getTime();
+    this._id = id;
     this._firstname = firstname || '';
     this._lastname = lastname || '';
     this._address = address || '';
@@ -92,5 +92,15 @@ export default class Employee {
       address: emp.address,
       phone: emp.phone,
     });
+  }
+
+  toJSON() {
+    return {
+      id: this.id,
+      firstname: this.firstname,
+      lastname: this.lastname,
+      address: this.address,
+      phone: this.phone,
+    };
   }
 }

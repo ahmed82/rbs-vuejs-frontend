@@ -34,7 +34,7 @@
         <div class="control">
           <button
             class="button is-success"
-            @click.prevent="$emit('save', form)"
+            @click.stop.prevent="$emit('save', form)"
             :disabled="!isFormValid || !hasChanged"
           >
             <span class="icon is-small">
@@ -42,7 +42,7 @@
             </span>
             <span>{{ buttonText }}</span>
           </button>
-          <button class="button is-danger" style="margin-left: 10px;" @click.stop="$emit('cancel')">
+          <button class="button is-danger" style="margin-left: 10px;" @click.stop.prevent="$emit('cancel')">
             <span>Cancel</span>
           </button>
         </div>

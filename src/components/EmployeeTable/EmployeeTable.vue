@@ -4,14 +4,14 @@
         <div v-show="action === 'view' || action === 'delete'">
           <h1 class="title is-3" style="text-align: justify;">
             Employees
-            <span class="subtitle is-6" >(click row to toggle select)</span>
           </h1>
           <ActionBar
             @action="handleAction"
             :disabled="!selectedEmployeeId"
+            @select-all="selectAllEmployees"
             :has-multiple-selections="!!(selectedEmployees.length > 1)"/>
           <table class="table is-striped is-hoverable is-fullwidth">
-            <EmployeeTableHeader />
+            <EmployeeTableHeader @sort="sortEmployees"/>
             <tbody>
               <EmployeeTableRow
                 class="employee-table"
@@ -19,7 +19,7 @@
                 :key="employee.id"
                 :employee="employee"
                 @select-employee="selectEmployee"
-                :selected="!!findSelectedEmployeeById(employee.id)"
+                :selected="!!selectedEmployees.includes(employee)"
               />
             </tbody>
           </table>
@@ -84,7 +84,7 @@ export default {
     },
     handleAction(action) {
       if (action === 'delete') {
-        this.deleteEmployee();
+        this.deleteEmployees();
       }
       this.action = action;
     },
@@ -102,7 +102,8 @@ export default {
     ...getters,
     employeeData() {
       if (this.action === 'edit') {
-        return this.selectedEmployees[0];
+        const [employee] = this.selectedEmployees;
+        return employee;
       }
       return undefined;
     },

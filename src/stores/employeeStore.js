@@ -1,19 +1,9 @@
 /* eslint-disable max-len */
 import Vue from 'vue';
 import axios from 'axios';
-import Employee from '@/models/Employee';
+import Employee from '../models/Employee';
 
 const state = Vue.observable({
-  // employees: [
-  //   new Employee(
-  //     {
-  //       id: 1, firstname: 'Sean', lastname: 'Fallmann', address: '1400 Margate Lane', phone: '555-555-5555',
-  //     },
-  //   ),
-  //   new Employee({
-  //     id: 2, firstname: 'Peter', lastname: 'Fallmann', address: '1400 Margate Lane', phone: '555-555-5555',
-  //   }),
-  // ],
   employees: [],
   selectedEmployees: [],
 });
@@ -23,7 +13,8 @@ export const getters = {
     return state.employees;
   },
   selectedEmployeeId() {
-    return (state.selectedEmployees.length && state.selectedEmployees[0].id) || 0;
+    const [employee] = state.selectedEmployees;
+    return employee?.id || 0;
   },
   selectedEmployees() {
     return state.selectedEmployees;
@@ -51,33 +42,56 @@ export const methods = {
   findSelectedEmployeeById(id) {
     return getters.selectedEmployees().find((e) => e.id === id);
   },
+  sortEmployees(sortType, dir) {
+    const employees = getters.employees();
+
+    employees.sort((emp1, emp2) => {
+      let a;
+      let b;
+
+      if (dir === 'asc') {
+        a = emp1[sortType].toString().toLowerCase();
+        b = emp2[sortType].toString().toLowerCase();
+      } else {
+        a = emp2[sortType].toString().toLowerCase();
+        b = emp1[sortType].toString().toLowerCase();
+      }
+      if (a < b) return -1;
+      if (a > b) return 1;
+      return 0;
+    });
+  },
+  selectAllEmployees() {
+    const employees = getters.employees();
+    setters.setSelectedEmployees([...employees]);
+  },
   selectEmployee(id) {
     const employee = this.findEmployeeById(id);
     const selectedEmployee = this.findSelectedEmployeeById(id);
 
     if (selectedEmployee) {
       setters.setSelectedEmployees(
-        getters.selectedEmployees().filter((e) => !Employee.isEqual(e, selectedEmployee)),
+        getters.selectedEmployees().length > 1 ? [selectedEmployee] : getters.selectedEmployees(),
       );
     } else {
       setters.setSelectedEmployees([...getters.selectedEmployees(), employee]);
     }
   },
   async addEmployee(employee) {
+    const res = await axios.post('/employees', employee.toJSON());
+
+    // eslint-disable-next-line no-param-reassign
+    employee.id = res.data.id;
     setters.setEmployees([...getters.employees(), new Employee(employee)]);
   },
-  editEmployee(data) {
-    const employee = getters.selectedEmployees()[0];
+  async editEmployee(data) {
+    const [employee] = getters.selectedEmployees();
+    await axios.patch(`/employees/${employee.id}`, data);
     employee.updateValues(data);
   },
-  deleteEmployee() {
-    setters.setEmployees(state.employees.filter((e) => !getters.selectedEmployees().includes(e)));
+  async deleteEmployees() {
+    await axios.delete('/employees', { data: [...getters.selectedEmployees()] });
     setters.setSelectedEmployees([]);
+    await this.fetchAllEmployees();
   },
-};
-
-export default {
-  getters,
-  setters,
-  methods,
 };
